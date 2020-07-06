@@ -255,26 +255,27 @@ export default class extends PureComponent {
         this.points = points;
         this.saveLine({ brushColor, brushRadius });
         return;
-      }
+      } else {
 
-      // Use timeout to draw
-      for (let i = 1; i < points.length; i++) {
+        // Use timeout to draw
+        for (let i = 1; i < points.length; i++) {
+          curTime += timeoutGap;
+          window.setTimeout(() => {
+            this.drawPoints({
+              points: points.slice(0, i + 1),
+              brushColor,
+              brushRadius
+            });
+          }, curTime);
+        }
+
         curTime += timeoutGap;
         window.setTimeout(() => {
-          this.drawPoints({
-            points: points.slice(0, i + 1),
-            brushColor,
-            brushRadius
-          });
+          // Save this line with its props instead of this.props
+          this.points = points;
+          this.saveLine({ brushColor, brushRadius });
         }, curTime);
       }
-
-      curTime += timeoutGap;
-      window.setTimeout(() => {
-        // Save this line with its props instead of this.props
-        this.points = points;
-        this.saveLine({ brushColor, brushRadius });
-      }, curTime);
     });
   };
 
