@@ -239,10 +239,15 @@ export default class extends PureComponent {
     let curTime = 0;
     let timeoutGap = immediate ? 0 : this.props.loadTimeOffset;
 
+    console.log("Drawing lines: ", lines)
+
     lines.forEach(line => {
       const { points, brushColor, brushRadius } = line;
 
       // Draw all at once if immediate flag is set, instead of using setTimeout
+
+      console.log("Immediate flag set to: ", immediate)
+
       if (immediate) {
         // Draw the points
         this.drawPoints({
@@ -253,7 +258,7 @@ export default class extends PureComponent {
 
         // Save line with the drawn points
         this.points = points;
-        this.saveLine({ brushColor, brushRadius });
+        this.saveLine({ brushColor, brushRadius, callChange: false });
         return;
       } else {
 
@@ -273,10 +278,15 @@ export default class extends PureComponent {
         window.setTimeout(() => {
           // Save this line with its props instead of this.props
           this.points = points;
-          this.saveLine({ brushColor, brushRadius });
+          this.saveLine({ brushColor, brushRadius, callChange: true });
         }, curTime);
       }
     });
+
+    if (immediate && lines.length >= 1) {
+      console.log("Calling change after immediate is true and done loop")
+      this.triggerOnChange()
+    }
   };
 
   handleDrawStart = e => {
@@ -312,7 +322,7 @@ export default class extends PureComponent {
     // Stop drawing & save the drawn line
     this.isDrawing = false;
     this.isPressing = false;
-    this.saveLine();
+    this.saveLine({callChange: true});
   };
 
   handleCanvasResize = (entries, observer) => {
@@ -422,7 +432,7 @@ export default class extends PureComponent {
     this.ctx.temp.stroke();
   };
 
-  saveLine = ({ brushColor, brushRadius } = {}) => {
+  saveLine = ({ brushColor, brushRadius, callChange } = {}) => {
     if (this.points.length < 2) return;
 
     // Save as new line
@@ -444,7 +454,9 @@ export default class extends PureComponent {
     // Clear the temporary line-drawing canvas
     this.ctx.temp.clearRect(0, 0, width, height);
 
-    this.triggerOnChange();
+    if (callChange) {
+      this.triggerOnChange();
+    }
   };
 
   triggerOnChange = () => {
