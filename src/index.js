@@ -239,14 +239,10 @@ export default class extends PureComponent {
     let curTime = 0;
     let timeoutGap = immediate ? 0 : this.props.loadTimeOffset;
 
-    console.log("Drawing lines: ", lines)
-
     lines.forEach(line => {
       const { points, brushColor, brushRadius } = line;
 
       // Draw all at once if immediate flag is set, instead of using setTimeout
-
-      console.log("Immediate flag set to: ", immediate)
 
       if (immediate) {
         // Draw the points
@@ -283,8 +279,9 @@ export default class extends PureComponent {
       }
     });
 
+    // Only trigger change when the whole 'transaction' is complete, of drawing all the lines.
+    // Do not trigger if nothing was drawn || or the array was empty. That is unncessary
     if (immediate && lines.length >= 1) {
-      console.log("Calling change after immediate is true and done loop")
       this.triggerOnChange()
     }
   };
