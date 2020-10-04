@@ -1,3 +1,9 @@
+## Changes Made
+<ul>
+  <li>Fixed immediate drawing flag to draw correctly</li>
+  <li>Treat loadSaveData as a transaction instead of seperate onChange listeners</li>
+</ul>
+
 <div align="center">
 <h1>React Canvas Draw</h1>
 </div>
