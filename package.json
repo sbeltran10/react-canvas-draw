@@ -1,7 +1,7 @@
 {
   "name": "@syoon/react-canvas-draw",
   "version": "1.0.0",
-  "description": "A simple yet powerful canvas-drawing component for React.",
+  "description": "A simple yet powerful canvas-drawing component for React. Modified from original package to provide some extra functionallity",
   "main": "lib/index.js",
   "module": "es/index.js",
   "files": [
