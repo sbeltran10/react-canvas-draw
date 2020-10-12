@@ -55,6 +55,12 @@
     "name": "Martin Beierling",
     "email": "mbeierling@gmail.com"
   },
+  "contributors": [
+    {
+      "name": "Santiago Beltran",
+      "email": "santiago@syoon.co"
+    }
+  ],
   "homepage": "https://embiem.github.io/react-canvas-draw/",
   "license": "MIT",
   "repository": "https://github.com/embiem/react-canvas-draw",
