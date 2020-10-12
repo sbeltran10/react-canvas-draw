@@ -253,6 +253,7 @@ export default class extends PureComponent {
       const { points, brushColor, brushRadius } = line;
 
       // Draw all at once if immediate flag is set, instead of using setTimeout
+
       if (immediate) {
         // Draw the points
         this.drawPoints({
@@ -263,29 +264,36 @@ export default class extends PureComponent {
 
         // Save line with the drawn points
         this.points = points;
-        this.saveLine({ brushColor, brushRadius });
+        this.saveLine({ brushColor, brushRadius, callChange: false });
         return;
-      }
+      } else {
 
-      // Use timeout to draw
-      for (let i = 1; i < points.length; i++) {
+        // Use timeout to draw
+        for (let i = 1; i < points.length; i++) {
+          curTime += timeoutGap;
+          window.setTimeout(() => {
+            this.drawPoints({
+              points: points.slice(0, i + 1),
+              brushColor,
+              brushRadius
+            });
+          }, curTime);
+        }
+
         curTime += timeoutGap;
         window.setTimeout(() => {
-          this.drawPoints({
-            points: points.slice(0, i + 1),
-            brushColor,
-            brushRadius
-          });
+          // Save this line with its props instead of this.props
+          this.points = points;
+          this.saveLine({ brushColor, brushRadius, callChange: true });
         }, curTime);
       }
-
-      curTime += timeoutGap;
-      window.setTimeout(() => {
-        // Save this line with its props instead of this.props
-        this.points = points;
-        this.saveLine({ brushColor, brushRadius });
-      }, curTime);
     });
+
+    // Only trigger change when the whole 'transaction' is complete, of drawing all the lines.
+    // Do not trigger if nothing was drawn || or the array was empty. That is unncessary
+    if (immediate && lines.length >= 1) {
+      this.triggerOnChange()
+    }
   };
 
   handleDrawStart = e => {
@@ -321,7 +329,7 @@ export default class extends PureComponent {
     // Stop drawing & save the drawn line
     this.isDrawing = false;
     this.isPressing = false;
-    this.saveLine();
+    this.saveLine({callChange: true});
   };
 
   handleCanvasResize = (entries, observer) => {
@@ -431,7 +439,7 @@ export default class extends PureComponent {
     this.ctx.temp.stroke();
   };
 
-  saveLine = ({ brushColor, brushRadius } = {}) => {
+  saveLine = ({ brushColor, brushRadius, callChange } = {}) => {
     if (this.points.length < 2) return;
 
     // Save as new line
@@ -453,7 +461,9 @@ export default class extends PureComponent {
     // Clear the temporary line-drawing canvas
     this.ctx.temp.clearRect(0, 0, width, height);
 
-    this.triggerOnChange();
+    if (callChange) {
+      this.triggerOnChange();
+    }
   };
 
   triggerOnChange = () => {
